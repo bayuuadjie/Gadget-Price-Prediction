@@ -1,0 +1,15 @@
+{
+  "name": "Harga pasaran HP (stub)",
+  "nodes": [
+    {"parameters": {"httpMethod": "POST", "path": "harga-pasaran", "responseMode": "responseNode", "options": {}},
+     "name": "Webhook", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0], "webhookId": "harga-pasaran"},
+    {"parameters": {"jsCode": "// GANTI dengan hasil scraping. Input ada di $input.first().json.body (model, ram_gb, storage_gb)\nreturn [{ json: { harga_pasaran: 4500000, jumlah_iklan: 0 } }];"},
+     "name": "Hitung harga pasaran", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [240, 0]},
+    {"parameters": {"respondWith": "json", "responseBody": "={{ $json }}", "options": {}},
+     "name": "Respond to Webhook", "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1.1, "position": [480, 0]}
+  ],
+  "connections": {
+    "Webhook": {"main": [[{"node": "Hitung harga pasaran", "type": "main", "index": 0}]]},
+    "Hitung harga pasaran": {"main": [[{"node": "Respond to Webhook", "type": "main", "index": 0}]]}
+  }
+}

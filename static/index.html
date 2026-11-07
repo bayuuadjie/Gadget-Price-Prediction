@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taksir Harga HP Bekas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#16213a;--mute:#5d6882;--line:#d5dbe6;--bg:#eef1f5;--card:#fff;--tag:#ffc93c;--ok:#1e7b4f;--bad:#b3392e;
+--fd:'Sora',system-ui,sans-serif;--fb:'IBM Plex Sans',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--fb)}
+header{padding:28px clamp(16px,4vw,48px) 8px;max-width:1120px;margin:auto}
+h1{font:700 clamp(26px,4vw,38px)/1.15 var(--fd);margin:0 0 6px;letter-spacing:-.02em}
+header p{margin:0;color:var(--mute);max-width:60ch}
+main{max-width:1120px;margin:auto;padding:20px clamp(16px,4vw,48px) 56px;display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;align-items:start}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+form{display:grid;gap:18px}
+fieldset{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:18px 18px 20px;margin:0;display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr))}
+legend{font:600 15px var(--fd);padding:0 8px;margin-left:-8px}
+.full{grid-column:1/-1}
+label,.lbl{display:grid;gap:5px;font-size:14px;font-weight:500}
+.hint{font-weight:400;color:var(--mute);font-size:13px}
+select,input[type=number]{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);width:100%}
+select:focus,input:focus,button:focus-visible,.seg input:focus-visible+span{outline:3px solid var(--tag);outline-offset:1px}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.seg label{display:block}
+.seg input{position:absolute;opacity:0}
+.seg span{display:block;text-align:center;padding:9px 0;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-weight:600}
+.seg input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.checks label{display:flex;grid-auto-flow:column;align-items:center;gap:8px;border:1px solid var(--line);border-radius:6px;padding:8px 12px;background:#fff;font-weight:400;cursor:pointer}
+.price-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.btn{font:600 15px var(--fb);border:0;border-radius:6px;padding:11px 18px;cursor:pointer}
+.btn.ghost{background:#fff;border:1px solid var(--ink);color:var(--ink)}
+.btn.main{background:var(--ink);color:#fff;padding:14px 18px;width:100%;font-size:16px}
+.btn:disabled{opacity:.55;cursor:wait}
+.msg{font-size:13px;min-height:19px;color:var(--mute)}
+.msg.err{color:var(--bad)}
+aside{position:sticky;top:20px}
+@media(max-width:900px){aside{position:static}}
+.tag{background:var(--card);border-radius:4px 4px 14px 14px;overflow:hidden;border:1px solid var(--line)}
+.tag .top{background:var(--tag);padding:14px 20px 12px;display:flex;align-items:center;gap:10px;font:600 14px var(--fd)}
+.tag .top i{width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--ink);display:inline-block}
+.tag .body{padding:20px}
+.empty{color:var(--mute);margin:0}
+.market{color:var(--mute);font-size:14px}
+.market s{font-weight:600}
+.big{font:700 clamp(32px,6vw,42px)/1.1 var(--fd);margin:4px 0 6px;letter-spacing:-.02em}
+.delta{display:inline-block;font-weight:600;font-size:14px;padding:3px 9px;border-radius:4px;background:#f6e2df;color:var(--bad)}
+.delta.up{background:#dcf0e6;color:var(--ok)}
+.range{margin-top:22px;font-size:13px;color:var(--mute)}
+.track{position:relative;height:8px;border-radius:4px;background:var(--bg);margin:10px 0 6px}
+.track b{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;background:var(--ink);border:3px solid #fff;transform:translateX(-50%)}
+.rl{display:flex;justify-content:space-between;font-weight:500;color:var(--ink)}
+.note{margin:18px 0 0;font-size:12.5px;color:var(--mute);border-top:1px dashed var(--line);padding-top:12px}
+@media(prefers-reduced-motion:no-preference){.tag .body.fresh{animation:pop .35s ease-out}@keyframes pop{from{opacity:.3;transform:translateY(6px)}}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Taksir harga HP bekas</h1>
+  <p>Isi spesifikasi dan kondisi unit, lalu ambil harga pasaran dari medsos. Hasilnya adalah harga rekomendasi untuk beli atau jual.</p>
+</header>
+<main>
+<form id="f" autocomplete="off">
+  <fieldset>
+    <legend>Unit</legend>
+    <label class="full">Model
+      <select id="model" required><option value="">Memuat daftar model…</option></select></label>
+    <label>RAM
+      <select id="ram_gb"><option>4</option><option>6</option><option selected>8</option><option>12</option></select></label>
+    <label>Penyimpanan
+      <select id="storage_gb"><option>64</option><option>128</option><option selected>256</option><option>512</option></select></label>
+    <label>Asal unit
+      <select id="asal_unit"><option>Resmi SEIN / Indonesia</option><option>Resmi iBox / Digimap</option><option>Inter / Impor</option></select></label>
+    <label>Status IMEI
+      <select id="status_imei"><option>Resmi Terdaftar</option><option>Terdaftar Bea Cukai</option><option>Simlok / Sinyal Blocked</option><option>Bypass</option></select></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Kondisi</legend>
+    <div class="lbl full">Kondisi fisik <span class="hint">1 = banyak cacat, 5 = mulus</span>
+      <div class="seg" id="kondisi">
+        <label><input type="radio" name="k" value="1"><span>1</span></label>
+        <label><input type="radio" name="k" value="2"><span>2</span></label>
+        <label><input type="radio" name="k" value="3" checked><span>3</span></label>
+        <label><input type="radio" name="k" value="4"><span>4</span></label>
+        <label><input type="radio" name="k" value="5"><span>5</span></label>
+      </div></div>
+    <label>Battery health (%)
+      <input type="number" id="battery_health" min="50" max="100" value="88"></label>
+    <label>Kelengkapan
+      <select id="kelengkapan"><option>Fullset Original</option><option>Unit + Charger OEM</option><option>Batangan</option></select></label>
+    <div class="lbl full">Pernah diservis <span class="hint">Kosongkan jika unit masih original</span>
+      <div class="checks" id="servis">
+        <label><input type="checkbox" value="Ganti LCD">Ganti LCD</label>
+        <label><input type="checkbox" value="Ganti Baterai">Ganti baterai</label>
+        <label><input type="checkbox" value="Ganti Housing">Ganti housing</label>
+        <label><input type="checkbox" value="Servis Mesin / Part Lain">Servis mesin / part lain</label>
+      </div></div>
+    <label class="full" style="grid-auto-flow:column;justify-content:start;align-items:center;gap:10px">
+      <input type="checkbox" id="garansi_aktif"> Garansi masih aktif</label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Harga pasaran di medsos</legend>
+    <div class="price-row full">
+      <label>Harga (Rp)
+        <input type="number" id="harga" min="100000" step="10000" placeholder="contoh: 4500000" required></label>
+      <button type="button" class="btn ghost" id="scrape">Ambil dari medsos</button>
+    </div>
+    <div class="msg full" id="scrapeMsg" role="status">Ketik manual, atau ambil otomatis lewat n8n.</div>
+  </fieldset>
+
+  <button class="btn main" id="go" type="submit">Hitung harga rekomendasi</button>
+</form>
+
+<aside aria-live="polite">
+  <div class="tag">
+    <div class="top"><i></i>Harga rekomendasi</div>
+    <div class="body" id="out"><p class="empty">Isi formulir lalu tekan “Hitung harga rekomendasi”. Hasil muncul di sini.</p></div>
+  </div>
+</aside>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const rp = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+const api = async (path, body) => {
+  const r = await fetch(path, body ? {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)} : {});
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : 'Permintaan gagal (' + r.status + ')');
+  return j;
+};
+
+api('/api/meta').then(m => {
+  $('model').innerHTML = '<option value="">Pilih model</option>' + m.models.map(x => `<option>${x}</option>`).join('');
+}).catch(e => { $('model').innerHTML = '<option value="">Gagal memuat model</option>'; });
+
+$('scrape').onclick = async () => {
+  if (!$('model').value) { $('scrapeMsg').className='msg err'; $('scrapeMsg').textContent='Pilih model dulu.'; return; }
+  const b = $('scrape'); b.disabled = true; b.textContent = 'Mengambil…';
+  $('scrapeMsg').className = 'msg'; $('scrapeMsg').textContent = 'Menunggu n8n, bisa sampai 1–2 menit.';
+  try {
+    const d = await api('/api/harga-pasaran', {model:$('model').value, ram_gb:+$('ram_gb').value, storage_gb:+$('storage_gb').value});
+    $('harga').value = d.harga_pasaran;
+    $('scrapeMsg').textContent = 'Harga pasaran ' + rp(d.harga_pasaran) + (d.jumlah_iklan ? ' dari ' + d.jumlah_iklan + ' iklan.' : '.');
+  } catch (e) { $('scrapeMsg').className = 'msg err'; $('scrapeMsg').textContent = e.message + ' Isi harga manual jika perlu.'; }
+  b.disabled = false; b.textContent = 'Ambil dari medsos';
+};
+
+$('f').onsubmit = async ev => {
+  ev.preventDefault();
+  const servis = [...document.querySelectorAll('#servis input:checked')].map(x => x.value);
+  const body = {
+    model: $('model').value, ram_gb: +$('ram_gb').value, storage_gb: +$('storage_gb').value,
+    asal_unit: $('asal_unit').value, status_imei: $('status_imei').value,
+    skala_kondisi_fisik: +document.querySelector('input[name=k]:checked').value,
+    battery_health: +$('battery_health').value,
+    riwayat_servis: servis.length ? servis.join(', ') : 'Original Normal',
+    kelengkapan: $('kelengkapan').value, garansi_aktif: $('garansi_aktif').checked ? 1 : 0,
+    harga_pasaran_medsos: +$('harga').value
+  };
+  const go = $('go'); go.disabled = true; go.textContent = 'Menghitung…';
+  try {
+    const r = await api('/api/predict', body);
+    const span = Math.max(r.rentang_atas - r.rentang_bawah, 1);
+    const pos = Math.min(100, Math.max(0, (r.harga_rekomendasi - r.rentang_bawah) / span * 100));
+    const down = r.selisih_persen < 0;
+    $('out').className = 'body fresh';
+    $('out').innerHTML = `
+      <div class="market">Harga pasaran medsos <s>${rp(body.harga_pasaran_medsos)}</s></div>
+      <div class="big">${rp(r.harga_rekomendasi)}</div>
+      <span class="delta ${down ? '' : 'up'}">${down ? '−' : '+'}${Math.abs(r.selisih_persen)}% dari harga pasaran</span>
+      <div class="range">Kisaran wajar
+        <div class="track"><b style="left:${pos}%"></b></div>
+        <div class="rl"><span>${rp(r.rentang_bawah)}</span><span>${rp(r.rentang_atas)}</span></div></div>
+      <p class="note">${body.model} · ${body.ram_gb}/${body.storage_gb} GB. Taksiran dari model Random Forest, dilatih dengan data yang masih sedikit. Pakai sebagai acuan, bukan harga pasti.</p>`;
+  } catch (e) {
+    $('out').className = 'body';
+    $('out').innerHTML = `<p class="empty" style="color:var(--bad)">${e.message}</p>`;
+  }
+  go.disabled = false; go.textContent = 'Hitung harga rekomendasi';
+};
+</script>
+</body>
+</html>
