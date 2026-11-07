@@ -1,0 +1,116 @@
+{
+  "id": "hargaPasaranHp1",
+  "name": "Harga pasaran HP (Facebook via Apify)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "harga-pasaran",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "harga-pasaran"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~facebook-marketplace-scraper/run-sync-get-dataset-items",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer GANTI_DENGAN_TOKEN_APIFY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ startUrls: [{ url: \"https://www.facebook.com/marketplace/jakarta/search/?query=\" + encodeURIComponent($('Webhook').item.json.body.model + \" \" + $('Webhook').item.json.body.storage_gb + \"GB\") }], resultsLimit: 10 }) }}",
+        "options": {
+          "timeout": 280000
+        }
+      },
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('Webhook').first().json.body;\nconst SKALA = 1; // ubah ke 1000 kalau semua harga terlihat dalam ribuan\nconst model = String(body.model).toLowerCase();\nconst storage = String(body.storage_gb);\n\nconst kunci = model.split(/\\s+/).filter(t => /\\d/.test(t));\nconst varian = ['pro', 'max', 'plus', 'ultra', 'mini', 'lite', 'fe', 'neo', 'turbo', 'se'];\nconst varianDilarang = varian.filter(v => !new RegExp('\\\\b' + v + '\\\\b').test(model));\nconst buang = ['dicari', 'wtb', 'case', 'casing', 'tempered', 'charger', 'lcd', 'sparepart', 'dus', 'kardus', 'minus', 'mati total'];\n\nconst rows = $input.all().map(i => i.json)\n  .filter(it => it.marketplace_listing_title || it.custom_title)\n  .map(it => ({\n    judul: String(it.marketplace_listing_title || it.custom_title || '').toLowerCase(),\n    harga: Number(String(it.listing_price?.amount ?? '').replace(/[^\\d]/g, '')) * SKALA,\n    dijual: !(it.is_sold || it.is_pending),\n  }));\n\nif (!rows.length) {\n  throw new Error('Apify tidak mengembalikan iklan untuk pencarian ini.');\n}\n\nconst storageDiJudul = j => [...j.matchAll(/\\b(64|128|256|512)\\s*(?:gb|g)?\\b/g)].map(m => m[1]);\n\nconst valid = rows.filter(r => {\n  if (!r.dijual || r.harga < 500000) return false;\n  if (!kunci.every(k => r.judul.includes(k))) return false;\n  if (buang.some(b => r.judul.includes(b))) return false;\n  if (varianDilarang.some(v => new RegExp('\\\\b' + v + '\\\\b').test(r.judul))) return false;\n  const st = storageDiJudul(r.judul);\n  if (st.length && !st.includes(storage)) return false;\n  return true;\n});\n\nif (!valid.length) {\n  throw new Error('Tidak ada iklan valid dari ' + rows.length + ' iklan. Contoh: ' + JSON.stringify(rows.slice(0, 5)));\n}\n\nconst urut = valid.map(r => r.harga).sort((a, b) => a - b);\nconst med = a => a[Math.floor(a.length / 2)];\nconst m = med(urut);\nconst akhir = urut.filter(p => p >= m * 0.6 && p <= m * 1.6);\n\nreturn [{ json: {\n  harga_pasaran: med(akhir),\n  jumlah_iklan: akhir.length,\n  debug: { iklan_awal: rows.length, lolos_filter: valid.length, min: akhir[0], maks: akhir[akhir.length - 1] }\n} }];"
+      },
+      "name": "Hitung harga pasaran",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Hitung harga pasaran",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hitung harga pasaran": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

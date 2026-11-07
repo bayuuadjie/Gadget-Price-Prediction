@@ -80,7 +80,7 @@ def harga_pasaran(body: ScrapeIn):
     if not url:
         raise HTTPException(503, "N8N_WEBHOOK_URL belum diatur. Lihat README langkah 4.")
     try:
-        r = httpx.post(url, json=body.model_dump(), timeout=120)
+        r = httpx.post(url, json=body.model_dump(), timeout=300)
         r.raise_for_status()
         data = r.json()
     except (httpx.HTTPError, ValueError) as e:

@@ -1,0 +1,28 @@
+services:
+  n8n:
+    image: n8nio/n8n:2.46.6
+    init: true
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - APIFY_TOKEN=${APIFY_TOKEN:-}
+      - GENERIC_TIMEZONE=Asia/Jakarta
+      - TZ=Asia/Jakarta
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n:/workflow:ro
+    entrypoint: ["/bin/sh", "/workflow/entrypoint.sh"]
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - N8N_WEBHOOK_URL=http://n8n:5678/webhook/harga-pasaran
+    depends_on:
+      - n8n
+
+volumes:
+  n8n_data:
