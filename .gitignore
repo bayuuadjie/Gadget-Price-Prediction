@@ -1,3 +1,25 @@
-.venv
 .env
-backend/__pycache__
+.env.*
+!.env.example
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Hasil ekspor n8n
+n8n/*_export*.json
+n8n/*.local.json
+
+# Editor dan os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Hasil build dan log
+*.log
+dist/
+build/
