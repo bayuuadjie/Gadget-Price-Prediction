@@ -87,11 +87,122 @@ aside{position:sticky;top:24px}
 @media(prefers-reduced-motion:no-preference){
 .tag .body.fresh{animation:pop .35s ease-out}@keyframes pop{from{opacity:.3;transform:translateY(8px)}}
 .sk{background:linear-gradient(90deg,var(--soft) 30%,var(--line) 50%,var(--soft) 70%);background-size:200% 100%;animation:sh 1.2s linear infinite}@keyframes sh{to{background-position:-200% 0}}}
+
+/* latar belakang: titik halus + label harga yang melayang pelan */
+:root{--dot:rgba(20,32,58,.13)}
+@media(prefers-color-scheme:dark){:root{--dot:rgba(255,255,255,.09)}}
+header,main{position:relative;z-index:1}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg::before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--dot) 1.3px,transparent 1.4px);background-size:24px 24px;
+-webkit-mask-image:linear-gradient(#000 20%,transparent 90%);mask-image:linear-gradient(#000 20%,transparent 90%)}
+.bg i{position:absolute;left:var(--x);top:var(--y);width:var(--w);height:calc(var(--w) * 1.4);border:2px solid var(--line);border-radius:8px 8px 18px 18px;
+transform:rotate(var(--r));background:color-mix(in srgb,var(--card) 35%,transparent)}
+.bg i::before{content:"";position:absolute;top:9%;left:50%;width:16%;aspect-ratio:1;margin-left:-8%;border:2px solid var(--line);border-radius:50%}
+.bg i::after{content:"";position:absolute;left:18%;right:18%;bottom:16%;height:3px;border-radius:2px;background:var(--line);box-shadow:0 -12px 0 var(--line)}
+.bg i.y{background:var(--tag);border-color:transparent;opacity:.32}
+.bg i.y::before{background:var(--bg);border:0}
+.bg i.y::after{background:rgba(20,32,58,.25);box-shadow:0 -12px 0 rgba(20,32,58,.25)}
+@media(prefers-reduced-motion:no-preference){
+.bg i{animation:drift var(--d) ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(0,0,0) rotate(var(--r))}to{transform:translate3d(16px,-34px,0) rotate(calc(var(--r) + 9deg))}}}
+@media(max-width:600px){.bg i:nth-child(4){display:none}}
+
+/* LIQUID-GLASS: tema gelap, kaca bening, cahaya, dan hover */
+:root{color-scheme:dark;--ink:#eef2ff;--mute:#9aa6c8;--line:rgba(255,255,255,.11);--bg:#070b16;--card:rgba(255,255,255,.055);--soft:rgba(255,255,255,.065);
+--tag:#ffc83d;--btn:#ffc83d;--onbtn:#14203a;--ok:#4cd3a0;--okbg:rgba(76,211,160,.14);--bad:#ff8f84;--badbg:rgba(255,143,132,.14);--ring:rgba(255,200,61,.32);--glow:255,176,40}
+body{background:var(--bg)}
+h1{text-shadow:0 0 48px rgba(var(--glow),.35)}
+/* latar: garis grid + cahaya */
+.bg::before{background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:56px 56px;
+-webkit-mask-image:radial-gradient(ellipse 80% 65% at 50% 22%,#000 25%,transparent 78%);mask-image:radial-gradient(ellipse 80% 65% at 50% 22%,#000 25%,transparent 78%)}
+.bg::after{content:"";position:absolute;left:50%;top:-24vh;width:92vw;height:72vh;margin-left:-46vw;border-radius:50%;
+background:radial-gradient(closest-side,rgba(var(--glow),.62),rgba(255,110,30,.2) 58%,transparent);filter:blur(64px)}
+.orb{position:absolute;border-radius:50%;filter:blur(80px)}
+.o1{right:-16vw;bottom:-22vh;width:62vw;height:62vw;background:radial-gradient(closest-side,rgba(90,110,255,.5),transparent)}
+.o2{left:-14vw;top:38vh;width:40vw;height:40vw;background:radial-gradient(closest-side,rgba(var(--glow),.3),transparent)}
+.bg i{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.13)}
+.bg i.y{opacity:.2}
+@media(prefers-reduced-motion:no-preference){
+.bg::after{animation:breathe 9s ease-in-out infinite alternate}
+.o1{animation:orb 16s ease-in-out infinite alternate}.o2{animation:orb 20s ease-in-out infinite alternate-reverse}
+@keyframes breathe{from{opacity:.75;transform:scale(.96)}to{opacity:1;transform:scale(1.05)}}
+@keyframes orb{from{transform:translate3d(0,0,0)}to{transform:translate3d(-5vw,-6vh,0)}}}
+/* kaca cair */
+form,.tag{position:relative;isolation:isolate;background:linear-gradient(150deg,rgba(255,255,255,.11),rgba(255,255,255,.035) 55%,rgba(255,255,255,.07));
+-webkit-backdrop-filter:blur(24px) saturate(170%);backdrop-filter:blur(24px) saturate(170%);border:1px solid rgba(255,255,255,.16);
+box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(255,255,255,.05),0 32px 70px -34px rgba(0,0,0,.9)}
+.tag{box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 0 90px -20px rgba(var(--glow),.35),0 32px 70px -34px rgba(0,0,0,.9)}
+form::before,.tag::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;
+background:radial-gradient(120% 60% at 12% -10%,rgba(255,255,255,.2),transparent 55%)}
+form::after,.tag::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;
+background:radial-gradient(420px circle at var(--mx,50%) var(--my,50%),rgba(var(--glow),.13),transparent 62%)}
+form:hover::after,.tag:hover::after{opacity:1}
+.card+.card{border-top-color:rgba(255,255,255,.09)}
+.tag .top{background:linear-gradient(135deg,#ffd75f,#ffae1f);box-shadow:0 8px 30px -10px rgba(var(--glow),.7)}
+.tag .top i{background:#0b1020}
+.perf::before,.perf::after{background:#0b1020;border-color:rgba(255,255,255,.16)}
+.track b{border-color:#0b1020;box-shadow:0 0 14px rgba(var(--glow),.9)}
+.track{background:linear-gradient(90deg,rgba(255,255,255,.14),var(--tag))}
+.stats div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07)}
+/* input */
+option{background:#0f1730;color:#eef2ff}
+select,input[type=number]{background-color:rgba(255,255,255,.055);border-color:rgba(255,255,255,.13)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%239aa6c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E")}
+select:hover,input:hover{border-color:rgba(var(--glow),.55)}
+select:focus,input:focus{border-color:rgb(var(--glow));box-shadow:0 0 0 4px var(--ring),0 0 24px -4px rgba(var(--glow),.5)}
+.seg{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.seg span:hover{color:#fff;background:rgba(255,255,255,.07)}
+.seg input:checked+span{box-shadow:0 0 22px -2px rgba(var(--glow),.75)}
+.checks label{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12)}
+.checks label:hover{border-color:rgba(var(--glow),.6);transform:translateY(-1px);box-shadow:0 8px 20px -10px rgba(var(--glow),.6)}
+.checks label:has(input:checked){background:rgba(var(--glow),.14);border-color:rgb(var(--glow))}
+/* tombol + hover */
+.btn{position:relative;overflow:hidden;isolation:isolate;transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .25s,background .25s,border-color .25s,color .25s}
+.btn::before{content:"";position:absolute;inset:0;z-index:-1;opacity:0;transition:opacity .25s;
+background:radial-gradient(130px circle at var(--mx,50%) var(--my,50%),rgba(255,255,255,.55),transparent 65%)}
+.btn:hover:not(:disabled)::before{opacity:1}
+.btn::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;transform:skewX(-22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);transition:left .7s}
+.btn:hover:not(:disabled)::after{left:130%}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:active:not(:disabled){transform:translateY(0) scale(.98)}
+.btn.main{background:linear-gradient(135deg,#ffd75f,#ffae1f);color:#14203a;box-shadow:0 0 0 1px rgba(255,255,255,.25) inset,0 12px 34px -10px rgba(var(--glow),.6)}
+.btn.main:hover:not(:disabled){box-shadow:0 0 0 1px rgba(255,255,255,.4) inset,0 16px 48px -8px rgba(var(--glow),.95),0 0 60px -6px rgba(var(--glow),.55)}
+.btn.ghost{border-color:rgba(255,255,255,.28);color:var(--ink);background:rgba(255,255,255,.04)}
+.btn.ghost:hover:not(:disabled){background:rgba(var(--glow),.14);border-color:rgb(var(--glow));box-shadow:0 0 28px -6px rgba(var(--glow),.7)}
+@media(max-width:900px){.btn.main{backdrop-filter:none}}
+
+/* LIGHT-FX: elemen latar berupa cahaya (gerak sama seperti sebelumnya) */
+.bg i.lt{border:0;border-radius:50%;height:var(--w);display:block;opacity:1;
+background:radial-gradient(closest-side,rgba(var(--c),.55),rgba(var(--c),.16) 55%,transparent);filter:blur(16px)}
+.bg i.lt::before,.bg i.lt::after{content:none}
+@media(max-width:600px){.bg i:nth-child(4){display:block}.bg i.lt:not(.s){opacity:.7}}
+/* jargon mengetik */
+.jargon{margin:22px 0 0;font:600 clamp(17px,4.6vw,24px)/1.35 var(--fd);letter-spacing:-.015em;color:var(--ink);white-space:nowrap}
+.jargon .type{color:var(--tag);text-shadow:0 0 22px rgba(var(--glow),.75)}
+.jargon .caret{display:inline-block;width:2px;height:1.05em;margin-left:3px;vertical-align:-.15em;background:var(--tag);box-shadow:0 0 12px rgba(var(--glow),.9)}
+@media(prefers-reduced-motion:no-preference){.jargon .caret{animation:blink 1s steps(1) infinite}@keyframes blink{50%{opacity:0}}}
+
+/* CALM-FX: cahaya besar saja, form lebih tenang */
+.bg i.lt.big{filter:blur(72px);background:radial-gradient(closest-side,rgba(var(--c),.5),rgba(var(--c),.14) 60%,transparent)}
+@media(max-width:600px){.bg i.lt.big{--w:80vw}}
+form{background:linear-gradient(150deg,rgba(255,255,255,.07),rgba(255,255,255,.02) 55%,rgba(255,255,255,.04)),rgba(8,12,26,.5);
+-webkit-backdrop-filter:blur(26px) saturate(110%);backdrop-filter:blur(26px) saturate(110%);
+box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 32px 70px -34px rgba(0,0,0,.9)}
+form::before{background:radial-gradient(120% 45% at 12% -8%,rgba(255,255,255,.06),transparent 55%)}
+form::after{display:none}
+
+/* H1-TYPE: judul dengan kata yang mengetik */
+h1{max-width:none}
+.h-type{display:block;min-height:1.08em;color:var(--tag);text-shadow:0 0 36px rgba(var(--glow),.85)}
+h1 .caret{display:inline-block;width:3px;height:.9em;margin-left:4px;vertical-align:-.08em;border-radius:2px;background:var(--tag);box-shadow:0 0 14px rgba(var(--glow),.95)}
+@media(prefers-reduced-motion:no-preference){h1 .caret{animation:blink 1s steps(1) infinite}}
 </style>
 </head>
 <body>
+<div class="bg" aria-hidden="true"><i class="lt big" style="--x:62%;--y:-8%;--w:46vw;--c:255,176,40;--r:0deg;--d:24s"></i><i class="lt big" style="--x:-12%;--y:50%;--w:42vw;--c:110,130,255;--r:0deg;--d:28s"></i><i class="lt big" style="--x:58%;--y:62%;--w:52vw;--c:110,130,255;--r:0deg;--d:21s"></i><b class="orb o1"></b><b class="orb o2"></b></div>
 <header>
-  <h1>Taksir harga HP bekas</h1>
+  <h1 aria-label="Taksir harga HP bekas yang mudah, cepat, dan praktis"><span aria-hidden="true">Taksir harga HP bekas yang
+    <span class="h-type"><span id="typed"></span><span class="caret"></span></span></span></h1>
   <p>Isi spesifikasi dan kondisi unit, lalu ambil harga pasaran dari medsos. Hasilnya adalah harga rekomendasi untuk beli atau jual.</p>
 </header>
 <main>
@@ -225,6 +336,28 @@ $('f').onsubmit = async ev => {
   }
   go.disabled = false; go.textContent = 'Hitung harga rekomendasi';
 };
+
+document.addEventListener('pointermove', e => {
+  const t = e.target.closest('.btn, .tag, form'); if (!t) return;
+  const r = t.getBoundingClientRect();
+  t.style.setProperty('--mx', (e.clientX - r.left) + 'px'); t.style.setProperty('--my', (e.clientY - r.top) + 'px');
+});
+
+(() => {
+  const el = $('typed'), words = ['mudah', 'cepat', 'praktis'];
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) { el.textContent = 'mudah, cepat, dan praktis'; return; }
+  let w = 0, c = 0, del = false;
+  const tick = () => {
+    const word = words[w];
+    el.textContent = word.slice(0, c);
+    let delay = del ? 55 : 110;
+    if (!del && c === word.length) { del = true; delay = 1500; }
+    else if (del && c === 0) { del = false; w = (w + 1) % words.length; delay = 350; }
+    else c += del ? -1 : 1;
+    setTimeout(tick, delay);
+  };
+  tick();
+})();
 </script>
 </body>
 </html>
